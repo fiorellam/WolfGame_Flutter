@@ -12,10 +12,11 @@ class HomeScreen extends StatefulWidget{
 class _HomeScreenState extends State<HomeScreen>{
   String _selectedValue = "Principiante"; //Valor inicial
   List<String> levelsList = ["Principiante", "Intermedio", "Avanzado", "Pro" ];
-  List<String> _items = ['Lionel Messi', 'Cristiano Ronaldo', 'Neymar', 'Kylian Mbappé', 'Sergio Ramos']; // Lista de jugadores
+  List<String> _items = ['Fiorella Rodriguez', 'Jesus Miguel Armenta', 'Eduardo Flores', 'Cindy']; // Lista de jugadores
   List<String> _filteredItems = []; // Lista que se actualizará con los elementos filtrados
   Set<String> _selectedItems = {}; // Conjunto para almacenar los elementos seleccionados
 
+  @override
   void initState() {
     super.initState();
     _filteredItems = _items; // Inicializa la lista de items filtrados con todos los elementos
@@ -87,6 +88,14 @@ class _HomeScreenState extends State<HomeScreen>{
                       color: isSelected ? Colors.green : Colors.grey,
                    ), // Cambia el color según el estado de selección,
                   title: Text(_filteredItems[index]),
+                  trailing: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text("Telefono: 6461778925"),
+                      // Text("Rol: Lobo")
+                    ],
+                  ),
+                  subtitle: Text("6461772925"),
                   onTap: () => _onSelectItem(_filteredItems[index]), // Maneja la selección
                 );
               },
