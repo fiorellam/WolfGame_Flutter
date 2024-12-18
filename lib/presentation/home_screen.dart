@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:wolf_game/presentation/widgets/dropdown_level.dart';
+import 'package:wolf_game/presentation/widgets/search_bar.dart';
 
 class HomeScreen extends StatefulWidget{
   const HomeScreen({super.key});
@@ -10,8 +11,15 @@ class HomeScreen extends StatefulWidget{
 
 class _HomeScreenState extends State<HomeScreen>{
   String _selectedValue = "Principiante"; //Valor inicial
-  List<String> levelsList = levels;
+  List<String> levelsList = ["Principiante", "Intermedio", "Avanzado", "Pro" ];
+  List<String> _items = ['Lionel Messi', 'Cristiano Ronaldo', 'Neymar', 'Kylian Mbappé', 'Sergio Ramos']; // Lista de jugadores
+  List<String> _filteredItems = []; // Lista que se actualizará con los elementos filtrados
+  Set<String> _selectedItems = {}; // Conjunto para almacenar los elementos seleccionados
 
+  void initState() {
+    super.initState();
+    _filteredItems = _items; // Inicializa la lista de items filtrados con todos los elementos
+  }
   //Función que será llamada cuando cambie el valor del dropdown
   void _handleDropdownLevelChange(String value){
     setState(() {
@@ -19,24 +27,74 @@ class _HomeScreenState extends State<HomeScreen>{
     });
   }
 
+  // Método que maneja los resultados filtrados
+  void _onFilter(List<String> filteredItems) {
+    setState(() {
+      _filteredItems = filteredItems; // Actualiza la lista con los elementos filtrados
+    });
+  }
+
+  // Método que maneja la selección de un item
+  // void _onSelectItem(String selectedItem) {
+  //   showDialog(
+  //     context: context,
+  //     builder: (context) {
+  //       return AlertDialog(
+  //         title: Text('Seleccionaste'),
+  //         content: Text(selectedItem),
+  //         actions: [
+  //           TextButton(
+  //             onPressed: () => Navigator.pop(context),
+  //             child: Text('Cerrar'),
+  //           ),
+  //         ],
+  //       );
+  //     },
+  //   );
+  // }
+
+   // Método que maneja la selección de un item
+  void _onSelectItem(String selectedItem) {
+    setState(() {
+      if (_selectedItems.contains(selectedItem)) {
+        _selectedItems.remove(selectedItem); // Si ya está seleccionado, lo deseleccionamos
+      } else {
+        _selectedItems.add(selectedItem); // Si no está seleccionado, lo seleccionamos
+      }
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Inicio Juego Lobo"),
+        title: Text('Buscar Jugadores'),
       ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            const SearchBar(),
-
-            // Usamos el DropdownWidget
-            DropdownLevel(items: levelsList, onChanged: _handleDropdownLevelChange),
-            const SizedBox(height: 20),
-            Text("Valor seleccionado: $_selectedValue", style: const TextStyle(fontSize: 18)),
-          ],
-        ),
+      body: Column(
+        children: [
+          // Usamos el widget SearchBar
+          SearchBar2(items: _items, onFilter: _onFilter),
+          const SizedBox(height: 20),
+            Expanded(
+            child: ListView.builder(
+              itemCount: _filteredItems.length, // Muestra los elementos filtrados
+              itemBuilder: (context, index) {
+                final item = _filteredItems[index];
+                final isSelected = _selectedItems.contains(item); // Verifica si el item está seleccionado
+                return ListTile(
+                  leading: Icon (
+                    isSelected ? Icons.check_circle : Icons.check_circle_outline, // Muestra el icono dependiendo de la selección
+                      color: isSelected ? Colors.green : Colors.grey,
+                   ), // Cambia el color según el estado de selección,
+                  title: Text(_filteredItems[index]),
+                  onTap: () => _onSelectItem(_filteredItems[index]), // Maneja la selección
+                );
+              },
+            ),
+          ),
+          DropdownLevel(items: levelsList, onChanged: _handleDropdownLevelChange),   
+          Text("Valor seleccionado: $_selectedValue", style: const TextStyle(fontSize: 18)),       
+        ],
       ),
     );
   }

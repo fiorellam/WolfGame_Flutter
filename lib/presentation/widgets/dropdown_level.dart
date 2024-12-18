@@ -39,5 +39,3 @@ class _DropdownLevelState extends State<DropdownLevel> {
     );
   }
 }
-
-const levels =["Principiante", "Intermedio", "Avanzado", "Pro" ];
