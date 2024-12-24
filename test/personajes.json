@@ -1,0 +1,46 @@
+{
+    "principiante": [
+        {
+            "name": "lobo"
+        },
+        {
+            "name": "bruja"
+        },
+        {
+            "name": "curandero"
+        },
+        {
+            "name": "vidente"
+        },
+        {
+            "name": "granjero"
+        }
+    ],
+    "intermedio": [
+        {
+            "name": "cupido"
+        },
+        {
+            "name": "protector"
+        }
+    ],
+    "avanzado": [
+        {
+            "name": "niña"
+        },
+        {
+            "name": "cazador"
+        }
+    ],
+    "pro": [
+        {
+            "name": "alcade"
+        },
+        {
+            "name": "lobo infectado"
+        },
+        {
+            "name":"leproso"
+        }
+    ]
+}
