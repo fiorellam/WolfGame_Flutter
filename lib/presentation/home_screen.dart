@@ -1,58 +1,66 @@
-import 'dart:convert';
-import 'package:flutter/services.dart';
 import 'package:flutter/material.dart';
 import 'package:wolf_game/presentation/widgets/dropdown_level.dart';
 import 'package:wolf_game/presentation/widgets/search_bar.dart';
 
-class HomeScreen extends StatefulWidget {
+class HomeScreen extends StatefulWidget{
   const HomeScreen({super.key});
 
   @override
   _HomeScreenState createState() => _HomeScreenState();
 }
 
-class _HomeScreenState extends State<HomeScreen> {
-  String _selectedValue = "Principiante"; // Valor inicial
-  List<String> levelsList = ["Principiante", "Intermedio", "Avanzado", "Pro"];
-  List<Map<String, String>> _players = []; // Lista de jugadores
-  List<Map<String, String>> _filteredPlayers = []; // Jugadores filtrados
+class _HomeScreenState extends State<HomeScreen>{
+  String _selectedValue = "Principiante"; //Valor inicial
+  List<String> levelsList = ["Principiante", "Intermedio", "Avanzado", "Pro" ];
+  List<String> _items = ['Fiorella Rodriguez', 'Jesus Miguel Armenta', 'Eduardo Flores', 'Cindy']; // Lista de jugadores
+  List<String> _filteredItems = []; // Lista que se actualizará con los elementos filtrados
   Set<String> _selectedItems = {}; // Conjunto para almacenar los elementos seleccionados
 
   @override
   void initState() {
     super.initState();
-    _loadPlayers(); // Cargar los jugadores cuando la vista se inicializa
+    _filteredItems = _items; // Inicializa la lista de items filtrados con todos los elementos
   }
-
-  // Función para cargar los jugadores desde el archivo JSON
-  Future<void> _loadPlayers() async {
-    final String response = await rootBundle.loadString('assets/usuarios.json');
-    final List<dynamic> data = json.decode(response); // Decodificar el JSON
+  //Función que será llamada cuando cambie el valor del dropdown
+  void _handleDropdownLevelChange(String value){
     setState(() {
-      _players = data.map((item) => {
-        "name": item['name'],
-        "phone": item['phone']
-      }).toList();
-      _filteredPlayers = _players; // Inicializar la lista filtrada con todos los jugadores
+      _selectedValue = value; //Actualizamos el valor del dropdown
     });
   }
 
-  // Función de filtrado para los jugadores
-  void _onFilter(String query) {
+  // Método que maneja los resultados filtrados
+  void _onFilter(List<String> filteredItems) {
     setState(() {
-      _filteredPlayers = _players
-          .where((player) => player['name']!.toLowerCase().contains(query.toLowerCase()))
-          .toList();
+      _filteredItems = filteredItems; // Actualiza la lista con los elementos filtrados
     });
   }
 
-  // Función que maneja la selección de un jugador
+  // Método que maneja la selección de un item
+  // void _onSelectItem(String selectedItem) {
+  //   showDialog(
+  //     context: context,
+  //     builder: (context) {
+  //       return AlertDialog(
+  //         title: Text('Seleccionaste'),
+  //         content: Text(selectedItem),
+  //         actions: [
+  //           TextButton(
+  //             onPressed: () => Navigator.pop(context),
+  //             child: Text('Cerrar'),
+  //           ),
+  //         ],
+  //       );
+  //     },
+  //   );
+  // }
+
+   // Método que maneja la selección de un item
   void _onSelectItem(String selectedItem) {
     setState(() {
       if (_selectedItems.contains(selectedItem)) {
-        _selectedItems.remove(selectedItem);
+        _selectedItems.remove(selectedItem); // Si ya está seleccionado, lo deseleccionamos
       } else {
-        _selectedItems.add(selectedItem);
+        _selectedItems.add(selectedItem); // Si no está seleccionado, lo seleccionamos
       }
     });
   }
@@ -66,44 +74,35 @@ class _HomeScreenState extends State<HomeScreen> {
       body: Column(
         children: [
           // Usamos el widget SearchBar
-          SearchBar2(items: _players.map((player) => player['name']!).toList(), onFilter: _onFilter),
+          SearchBar2(items: _items, onFilter: _onFilter),
           const SizedBox(height: 20),
-          Expanded(
-            child: FutureBuilder(
-              future: _loadPlayers(),
-              builder: (context, snapshot) {
-                if (snapshot.connectionState == ConnectionState.waiting) {
-                  return Center(child: CircularProgressIndicator());
-                } else if (snapshot.hasError) {
-                  return Center(child: Text('Error al cargar jugadores'));
-                } else {
-                  return ListView.builder(
-                    itemCount: _filteredPlayers.length,
-                    itemBuilder: (context, index) {
-                      final player = _filteredPlayers[index];
-                      final isSelected = _selectedItems.contains(player['name']);
-                      return ListTile(
-                        leading: Icon(
-                          isSelected ? Icons.check_circle : Icons.check_circle_outline,
-                          color: isSelected ? Colors.green : Colors.grey,
-                        ),
-                        title: Text(player['name']!),
-                        subtitle: Text(player['phone']!),
-                        trailing: Text(player['role']!),
-                        onTap: () => _onSelectItem(player['name']!),
-                      );
-                    },
-                  );
-                }
+            Expanded(
+            child: ListView.builder(
+              itemCount: _filteredItems.length, // Muestra los elementos filtrados
+              itemBuilder: (context, index) {
+                final item = _filteredItems[index];
+                final isSelected = _selectedItems.contains(item); // Verifica si el item está seleccionado
+                return ListTile(
+                  leading: Icon (
+                    isSelected ? Icons.check_circle : Icons.check_circle_outline, // Muestra el icono dependiendo de la selección
+                      color: isSelected ? Colors.green : Colors.grey,
+                   ), // Cambia el color según el estado de selección,
+                  title: Text(_filteredItems[index]),
+                  trailing: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text("Telefono: 6461778925"),
+                      // Text("Rol: Lobo")
+                    ],
+                  ),
+                  subtitle: Text("6461772925"),
+                  onTap: () => _onSelectItem(_filteredItems[index]), // Maneja la selección
+                );
               },
             ),
           ),
-          DropdownLevel(items: levelsList, onChanged: (value) {
-            setState(() {
-              _selectedValue = value;
-            });
-          }),
-          Text("Valor seleccionado: $_selectedValue", style: const TextStyle(fontSize: 18)),
+          DropdownLevel(items: levelsList, onChanged: _handleDropdownLevelChange),   
+          Text("Valor seleccionado: $_selectedValue", style: const TextStyle(fontSize: 18)),       
         ],
       ),
     );
